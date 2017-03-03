@@ -12,14 +12,15 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 
 	internal sealed class TestSuiteMessage : XmlMessage {
 
-		public TestSuiteType? Type { get; private set; }
+		public TestSuiteType? Type { get; }
 
 		public override MessageKind Kind => MessageKind.TestSuite;
 
 		public TestSuiteMessage( XmlReader reader ) : base( reader ) {
 			TestSuiteType tst;
-			Enum.TryParse( reader.GetAttribute( "type" ), out tst );
-			Type = tst;
+			if( Enum.TryParse( reader.GetAttribute( "type" ), out tst ) ) {
+				Type = tst;
+			}
 		}
 
 	}
