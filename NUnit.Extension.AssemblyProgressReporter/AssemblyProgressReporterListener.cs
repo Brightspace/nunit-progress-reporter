@@ -34,7 +34,7 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 		private void OnSuiteStarted( StartSuiteMessage message ) {
 			var suite = message.FullName;
 
-			if( !File.Exists( suite ) ) {
+			if( !Path.IsPathRooted( suite ) ) {
 				return;
 			}
 
