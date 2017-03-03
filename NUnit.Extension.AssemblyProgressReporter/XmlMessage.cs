@@ -11,7 +11,7 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 
 	internal abstract class XmlMessage {
 
-		public string FullName { get; private set; }
+		public string FullName { get; }
 
 		public abstract MessageKind Kind { get; }
 
