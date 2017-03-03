@@ -11,4 +11,7 @@
 		<copyright>Copyright 2017</copyright>
 		<tags>NUnit</tags>
 	</metadata>
+	<files>
+		<file src="NUnit.Extension.AssemblyProgressReporter.dll" target="tools" />
+	</files>
 </package>
