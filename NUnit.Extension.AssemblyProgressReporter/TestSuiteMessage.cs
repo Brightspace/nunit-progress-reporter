@@ -16,9 +16,9 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 
 		public override MessageKind Kind => MessageKind.TestSuite;
 
-		public TestSuiteMessage( XmlNode node ) : base( node ) {
+		public TestSuiteMessage( XmlReader reader ) : base( reader ) {
 			TestSuiteType tst;
-			Enum.TryParse( node.Attributes["type"].Value, out tst );
+			Enum.TryParse( reader.GetAttribute( "type" ), out tst );
 			Type = tst;
 		}
 

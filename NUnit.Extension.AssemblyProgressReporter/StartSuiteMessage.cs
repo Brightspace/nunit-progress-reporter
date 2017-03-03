@@ -6,9 +6,8 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 
 		public override MessageKind Kind => MessageKind.StartSuite;
 
-
-		public StartSuiteMessage( XmlNode node )
-			: base( node ) { }
+		public StartSuiteMessage( XmlReader reader )
+			: base( reader ) { }
 
 	}
 

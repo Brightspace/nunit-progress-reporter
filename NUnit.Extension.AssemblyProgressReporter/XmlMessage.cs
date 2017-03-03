@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Xml;
 
 namespace NUnit.Extension.AssemblyProgressReporter {
@@ -10,37 +11,42 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 
 	internal abstract class XmlMessage {
 
-		public string Id { get; private set; }
-
-		public string Name { get; private set; }
-
 		public string FullName { get; private set; }
 
 		public abstract MessageKind Kind { get; }
-	
+
 		public XmlMessage( XmlNode node ) {
-			Id = node.Attributes["id"].Value;
-			Name = node.Attributes["name"].Value;
 			FullName = node.Attributes["fullname"].Value;
 		}
 
+		public XmlMessage( XmlReader reader ) {
+			FullName = reader.GetAttribute( "fullname" );
+		}
+
 		internal static XmlMessage Parse( string xml ) {
-			var node = ReadXml( xml );
-			switch( node.Name ) {
-				case "start-suite":
-					return new StartSuiteMessage( node );
-				case "test-suite":
-					return new TestSuiteMessage( node );
-				default:
+			using( var stream = new StringReader( xml ) )
+			using( var reader = XmlReader.Create( stream ) ) {
+
+				if( !reader.Read() ) {
 					return null;
+				}
+				if( reader.NodeType != XmlNodeType.Element ) {
+					return null;
+				}
+
+				var messageType = reader.Name;
+				switch( messageType ) {
+					case "start-suite":
+						return new StartSuiteMessage( reader );
+					case "test-suite":
+						return new TestSuiteMessage( reader );
+					default:
+						return null;
+				}
+
 			}
 		}
 
-		private static XmlNode ReadXml( string xml ) {
-			var doc = new XmlDocument();
-			doc.LoadXml( xml );
-			return doc.FirstChild;
-		}
 	}
 
 }
