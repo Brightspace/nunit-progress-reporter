@@ -15,10 +15,6 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 
 		public abstract MessageKind Kind { get; }
 
-		public XmlMessage( XmlNode node ) {
-			FullName = node.Attributes["fullname"].Value;
-		}
-
 		public XmlMessage( XmlReader reader ) {
 			FullName = reader.GetAttribute( "fullname" );
 		}
