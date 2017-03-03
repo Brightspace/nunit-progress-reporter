@@ -20,10 +20,10 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 			switch( message.Kind ) {
 
 				case MessageKind.StartSuite:
-					OnSuiteStarted( message as StartSuiteMessage );
+					OnSuiteStarted( (StartSuiteMessage)message );
 					break;
 				case MessageKind.TestSuite:
-					OnSuiteCompleted( message as TestSuiteMessage );
+					OnSuiteCompleted( (TestSuiteMessage)message );
 					break;
 
 				default:
