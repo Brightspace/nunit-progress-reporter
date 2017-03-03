@@ -1,7 +1,7 @@
-﻿using NUnit.Engine;
-using NUnit.Engine.Extensibility;
-using System;
+﻿using System;
 using System.IO;
+using NUnit.Engine;
+using NUnit.Engine.Extensibility;
 
 namespace NUnit.Extension.AssemblyProgressReporter {
 	[Extension( Enabled = true, Description = "Logs assembly start and stop progress to Console.Out." )]
@@ -34,12 +34,10 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 		private void OnSuiteStarted( StartSuiteMessage message ) {
 			var suite = message.FullName;
 
-			if( !Path.IsPathRooted( suite ) ) {
-				return;
+			string assembly;
+			if( TryGetAssembly( suite, out assembly ) ) {
+				Console.WriteLine( $"Starting {assembly}" );
 			}
-
-			var assembly = Path.GetFileName( suite );
-			Console.WriteLine( $"Starting {assembly}" );
 		}
 
 		private void OnSuiteCompleted( TestSuiteMessage message ) {
@@ -48,10 +46,25 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 			}
 
 			var suite = message.FullName;
-			if( File.Exists( suite ) ) {
-				var assembly = Path.GetFileName( suite );
+
+			string assembly;
+			if( TryGetAssembly( suite, out assembly ) ) {
 				Console.WriteLine( $"Finished {assembly}" );
 			}
+		}
+
+		private static bool TryGetAssembly(
+				string suite,
+				out string assembly
+			) {
+
+			if( !Path.IsPathRooted( suite ) ) {
+				assembly = null;
+				return false;
+			}
+
+			assembly = Path.GetFileName( suite );
+			return true;
 		}
 	}
 
