@@ -4,34 +4,39 @@ using NUnit.Engine;
 using NUnit.Engine.Extensibility;
 
 namespace NUnit.Extension.AssemblyProgressReporter {
+
 	[Extension( Enabled = true, Description = "Logs assembly start and stop progress to Console.Out." )]
 	public class AssemblyProgressReporterListener : ITestEventListener {
+
 		void ITestEventListener.OnTestEvent( string report ) {
-			if( string.IsNullOrWhiteSpace( report ) ) {
-				return;
-			}
 
-			var message = XmlMessage.Parse( report );
+			try {
+				XmlMessage message = XmlMessage.Parse( report );
+				if( message == null ) {
+					return;
+				}
 
-			if( message == null ) {
-				return;
-			}
+				switch( message.Kind ) {
 
-			switch( message.Kind ) {
+					case MessageKind.StartSuite:
+						OnSuiteStarted( (StartSuiteMessage)message );
+						break;
 
-				case MessageKind.StartSuite:
-					OnSuiteStarted( (StartSuiteMessage)message );
-					break;
-				case MessageKind.TestSuite:
-					OnSuiteCompleted( (TestSuiteMessage)message );
-					break;
+					case MessageKind.TestSuite:
+						OnSuiteCompleted( (TestSuiteMessage)message );
+						break;
 
-				default:
-					break;
+					default:
+						break;
+				}
+
+			} catch( Exception err ) {
+				Console.Error.WriteLine( "Unhandled exception in assembly progress reporter extension: {0}", err );
 			}
 		}
 
 		private void OnSuiteStarted( StartSuiteMessage message ) {
+
 			var suite = message.FullName;
 
 			string assembly;
@@ -41,6 +46,7 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 		}
 
 		private void OnSuiteCompleted( TestSuiteMessage message ) {
+
 			if( message.Type != TestSuiteType.Assembly ) {
 				return;
 			}
