@@ -37,10 +37,8 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 
 		private void OnSuiteStarted( StartSuiteMessage message ) {
 
-			var suite = message.FullName;
-
 			string assembly;
-			if( TryGetAssembly( suite, out assembly ) ) {
+			if( TryGetAssembly( message.FullName, out assembly ) ) {
 				Console.WriteLine( $"Starting {assembly}" );
 			}
 		}
@@ -51,25 +49,30 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 				return;
 			}
 
-			var suite = message.FullName;
-
 			string assembly;
-			if( TryGetAssembly( suite, out assembly ) ) {
+			if( TryGetAssembly( message.FullName, out assembly ) ) {
 				Console.WriteLine( $"Finished {assembly}" );
 			}
 		}
 
-		private static bool TryGetAssembly(
-				string suite,
+		private static readonly char[] InvalidPathChars = Path.GetInvalidPathChars();
+
+		internal static bool TryGetAssembly(
+				string fullName,
 				out string assembly
 			) {
 
-			if( !Path.IsPathRooted( suite ) ) {
+			if( fullName.IndexOfAny( InvalidPathChars ) >= 0 ) {
 				assembly = null;
 				return false;
 			}
 
-			assembly = Path.GetFileName( suite );
+			if( !Path.IsPathRooted( fullName ) ) {
+				assembly = null;
+				return false;
+			}
+
+			assembly = Path.GetFileName( fullName );
 			return true;
 		}
 	}
