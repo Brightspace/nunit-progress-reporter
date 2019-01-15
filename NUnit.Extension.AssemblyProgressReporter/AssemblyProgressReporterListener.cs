@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using System.Collections.Generic;
 using NUnit.Engine;
 using NUnit.Engine.Extensibility;
 
@@ -7,6 +7,8 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 
 	[Extension( Enabled = true, Description = "Logs assembly start and stop progress to Console.Out." )]
 	public class AssemblyProgressReporterListener : ITestEventListener {
+
+		private readonly HashSet<string> m_finishedAssemblies = new HashSet<string>();
 
 		void ITestEventListener.OnTestEvent( string report ) {
 
@@ -36,11 +38,11 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 		}
 
 		private void OnSuiteStarted( StartSuiteMessage message ) {
-
-			string assembly;
-			if( TryGetAssembly( message.FullName, out assembly ) ) {
-				Console.WriteLine( $"Starting {assembly}" );
+			if( message.ParentId != "" ) {
+				return;
 			}
+
+			Console.WriteLine( $"Starting { message.Name }" );
 		}
 
 		private void OnSuiteCompleted( TestSuiteMessage message ) {
@@ -49,31 +51,11 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 				return;
 			}
 
-			string assembly;
-			if( TryGetAssembly( message.FullName, out assembly ) ) {
-				Console.WriteLine( $"Finished {assembly}" );
-			}
-		}
-
-		private static readonly char[] InvalidPathChars = Path.GetInvalidPathChars();
-
-		internal static bool TryGetAssembly(
-				string fullName,
-				out string assembly
-			) {
-
-			if( fullName.IndexOfAny( InvalidPathChars ) >= 0 ) {
-				assembly = null;
-				return false;
+			if( !m_finishedAssemblies.Add( message.Id ) ) {
+				return;
 			}
 
-			if( !Path.IsPathRooted( fullName ) ) {
-				assembly = null;
-				return false;
-			}
-
-			assembly = Path.GetFileName( fullName );
-			return true;
+			Console.WriteLine( $"Finished {message.Name}" );
 		}
 	}
 

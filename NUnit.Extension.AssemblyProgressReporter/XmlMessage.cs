@@ -11,12 +11,15 @@ namespace NUnit.Extension.AssemblyProgressReporter {
 
 	internal abstract class XmlMessage {
 
-		public string FullName { get; }
+		public string Name { get; }
+
+		public string Id { get; }
 
 		public abstract MessageKind Kind { get; }
 
 		public XmlMessage( XmlReader reader ) {
-			FullName = reader.GetAttribute( "fullname" );
+			Name = reader.GetAttribute( "name" );
+			Id = reader.GetAttribute( "id" );
 		}
 
 		internal static XmlMessage Parse( string xml ) {
